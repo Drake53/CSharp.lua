@@ -1813,7 +1813,7 @@ namespace CSharpLua {
           if (assignment.Left is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
             goto Fail;
         } else if (descendant is ArgumentSyntax argument) {
-          if (argument.RefKindKeyword != default)
+          if (argument.RefKindKeyword != default && argument.Expression is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
             goto Fail;
         }
       }
