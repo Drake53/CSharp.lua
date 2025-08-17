@@ -437,11 +437,11 @@ local function orderBy(source, keySelector, comparer, TKey, descending)
   if comparer == nil then comparer = Comparer_1(TKey).getDefault() end
   local keys = {}
   local function getKey(t)
-    local key = t or t == nil and null
-    local k = keys[key]
+    local item = wrap(t)
+    local k = keys[item]
     if k == nil then
       k = keySelector(t)
-      keys[key] = k
+      keys[item] = k
     end
     return k
   end
@@ -487,11 +487,11 @@ local function thenBy(source, keySelector, comparer, TKey, descending)
   if comparer == nil then comparer = Comparer_1(TKey).getDefault() end
   local keys = {}
   local function getKey(t)
-    local key = t or t == nil and null
-    local k = keys[key]
+    local item = wrap(t)
+    local k = keys[item]
     if k == nil then
       k = keySelector(t)
-      keys[key] = k
+      keys[item] = k
     end
     return k
   end
