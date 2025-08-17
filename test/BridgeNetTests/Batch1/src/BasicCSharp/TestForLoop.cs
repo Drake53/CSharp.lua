@@ -204,7 +204,19 @@ namespace Bridge.ClientTest.BasicCSharp
         }
 
         [Test]
-        public static void TestWithIncrement()
+        public static void TestWithIncrementPrefix()
+        {
+            var list = new List<int>();
+            for (var i = 0; i < 5; i += 2)
+            {
+                list.Add(i);
+                --i;
+            }
+            Assert.AreDeepEqual(new int[] { 0, 1, 2, 3, 4 }, list);
+        }
+
+        [Test]
+        public static void TestWithIncrementSuffix()
         {
             var list = new List<int>();
             for (var i = 0; i < 5; i += 2)

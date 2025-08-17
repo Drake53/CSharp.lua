@@ -1801,8 +1801,13 @@ namespace CSharpLua {
       }
 
       foreach (var descendant in node.Statement.DescendantNodesAndSelf()) {
-        if (descendant is PostfixUnaryExpressionSyntax postfix) {
-          if (postfix.Operand is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+        if (descendant is PrefixUnaryExpressionSyntax prefix) {
+          if (prefix.Kind() is SyntaxKind.PreDecrementExpression or SyntaxKind.PreIncrementExpression &&
+            prefix.Operand is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+            goto Fail;
+        } else if (descendant is PostfixUnaryExpressionSyntax postfix) {
+          if (postfix.Kind() is SyntaxKind.PostDecrementExpression or SyntaxKind.PostIncrementExpression &&
+            postfix.Operand is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
             goto Fail;
         } else if (descendant is AssignmentExpressionSyntax assignment) {
           if (assignment.Left is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
