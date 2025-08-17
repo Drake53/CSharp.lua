@@ -28,6 +28,7 @@ local isArrayLike = System.isArrayLike
 local isDictLike = System.isDictLike
 local Array = System.Array
 local arrayEnumerator = Array.GetEnumerator
+local null = System.null
 
 local NullReferenceException = System.NullReferenceException
 local ArgumentNullException = System.ArgumentNullException
@@ -436,10 +437,11 @@ local function orderBy(source, keySelector, comparer, TKey, descending)
   if comparer == nil then comparer = Comparer_1(TKey).getDefault() end
   local keys = {}
   local function getKey(t)
-    local k = keys[t]
+    local key = t or t == nil and null
+    local k = keys[key]
     if k == nil then
       k = keySelector(t)
-      keys[t] = k
+      keys[key] = k
     end
     return k
   end
@@ -485,10 +487,11 @@ local function thenBy(source, keySelector, comparer, TKey, descending)
   if comparer == nil then comparer = Comparer_1(TKey).getDefault() end
   local keys = {}
   local function getKey(t)
-    local k = keys[t]
+    local key = t or t == nil and null
+    local k = keys[key]
     if k == nil then
       k = keySelector(t)
-      keys[t] = k
+      keys[key] = k
     end
     return k
   end

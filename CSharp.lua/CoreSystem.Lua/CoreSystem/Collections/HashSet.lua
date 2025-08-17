@@ -70,19 +70,11 @@ end, {
 }, 1)
 
 local HashSet = {
-  __ctor__ = function (this, ...)
-    local n = select("#", ...)
-    local collection, comparer
-    if n == 1 then
-      local c = ...
-      if type(c) == "table" then
-        if c.GetEnumerator then
-          collection = c
-        end
-          comparer = c
-      end
-    elseif n == 2 then
-      collection, comparer = ...
+  __ctor__ = function (this, collection, comparer)
+    if type(collection) ~= "table" then
+      collection = nil
+    elseif not collection.GetEnumerator then
+      collection, comparer = nil, collection
     end
     this.dict = System.Dictionary(this.__genericT__, System.Boolean)(comparer)
     if collection then
@@ -236,7 +228,35 @@ local HashSet = {
       return match(unWrap(k))
     end)
   end,
-  TrimExcess = System.emptyFn
+  TrimExcess = System.emptyFn,
+  CopyTo = function (this, array, arrayIndex, count)
+    arrayIndex = arrayIndex or 0
+    count = count or this:getCount()
+    if array == nil then
+      throw(ArgumentNullException("array"))
+    end
+    if arrayIndex < 0 then
+      throw(System.ArgumentOutOfRangeException("arrayIndex"))
+    end
+    if count < 0 then
+      throw(System.ArgumentOutOfRangeException("count"))
+    end
+    local arrayCount = array:getCount()
+    if arrayIndex >= arrayCount then
+      throw(System.ArgumentException("arrayIndex"))
+    end
+    if arrayIndex + count > arrayCount then
+      throw(System.ArgumentException("count is greater than the available space from arrayIndex to the end of the destination array"))
+    end
+    count = count + arrayIndex
+    for _, kv in each(this.dict) do
+      if arrayIndex >= count then
+        return
+      end
+      array:set(arrayIndex, kv[1])
+      arrayIndex = arrayIndex + 1
+    end
+  end
 }
 
 function System.hashSetFromTable(t, T)
@@ -245,7 +265,7 @@ end
 
 System.HashSet = System.define("System.Collections.Generic.HashSet", function(T)
   return {
-    base = { System.ICollection_1(T), System.ISet_1(T) },
+    base = { System.ISet_1(T), System.IReadOnlySet_1(T) },
     __genericT__ = T,
     __genericTKey__ = T,
   }
