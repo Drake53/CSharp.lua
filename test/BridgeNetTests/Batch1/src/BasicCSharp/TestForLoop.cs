@@ -195,7 +195,16 @@ namespace Bridge.ClientTest.BasicCSharp
         }
 
         [Test]
-        public static void TestWithModifying()
+        public static void TestWithIncrementNoBlock()
+        {
+            var list = new List<int>();
+            for (var i = 0; i < 5; i += 2)
+                list.Add(i--);
+            Assert.AreDeepEqual(new int[] { 0, 1, 2, 3, 4 }, list);
+        }
+
+        [Test]
+        public static void TestWithIncrement()
         {
             var list = new List<int>();
             for (var i = 0; i < 5; i += 2)
@@ -207,11 +216,26 @@ namespace Bridge.ClientTest.BasicCSharp
         }
 
         [Test]
-        public static void TestWithModifyingNoBlock()
+        public static void TestWithCompound()
         {
             var list = new List<int>();
             for (var i = 0; i < 5; i += 2)
-                list.Add(i--);
+            {
+                list.Add(i);
+                i -= 1;
+            }
+            Assert.AreDeepEqual(new int[] { 0, 1, 2, 3, 4 }, list);
+        }
+
+        [Test]
+        public static void TestWithAssignment()
+        {
+            var list = new List<int>();
+            for (var i = 0; i < 5; i += 2)
+            {
+                list.Add(i);
+                i = 1 + i - 2;
+            }
             Assert.AreDeepEqual(new int[] { 0, 1, 2, 3, 4 }, list);
         }
 
