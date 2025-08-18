@@ -1572,32 +1572,24 @@ namespace CSharpLua {
       return false;
     }
 
-    private bool IsNumericalForLess(SyntaxKind kind, out bool isLess) {
+    private bool IsNumericalForLess(SyntaxKind kind) {
       switch (kind) {
         case SyntaxKind.NotEqualsExpression:
         case SyntaxKind.LessThanExpression:
-          isLess = true;
-          return true;
         case SyntaxKind.LessThanOrEqualExpression:
-          isLess = false;
           return true;
         default:
-          isLess = false;
           return false;
       }
     }
 
-    private bool IsNumericalForGreater(SyntaxKind kind, out bool isGreater) {
+    private bool IsNumericalForGreater(SyntaxKind kind) {
       switch (kind) {
         case SyntaxKind.NotEqualsExpression:
         case SyntaxKind.GreaterThanExpression:
-          isGreater = true;
-          return true;
         case SyntaxKind.GreaterThanOrEqualExpression:
-          isGreater = false;
           return true;
         default:
-          isGreater = false;
           return false;
       }
     }
@@ -1802,6 +1794,30 @@ namespace CSharpLua {
         goto Fail;
       }
 
+      if (conditionKind is SyntaxKind.GreaterThanExpression or SyntaxKind.LessThanExpression) {
+        var typeInfo = semanticModel_.GetTypeInfo(node.Declaration.Type);
+        if (!Utility.IsCastIntegerType(typeInfo.Type))
+          goto Fail;
+      }
+
+      foreach (var descendant in node.Statement.DescendantNodesAndSelf()) {
+        if (descendant is PrefixUnaryExpressionSyntax prefix) {
+          if (prefix.Kind() is SyntaxKind.PreDecrementExpression or SyntaxKind.PreIncrementExpression &&
+            prefix.Operand is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+            goto Fail;
+        } else if (descendant is PostfixUnaryExpressionSyntax postfix) {
+          if (postfix.Kind() is SyntaxKind.PostDecrementExpression or SyntaxKind.PostIncrementExpression &&
+            postfix.Operand is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+            goto Fail;
+        } else if (descendant is AssignmentExpressionSyntax assignment) {
+          if (assignment.Left is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+            goto Fail;
+        } else if (descendant is ArgumentSyntax argument) {
+          if (argument.RefKindKeyword != default && argument.Expression is IdentifierNameSyntax name && variable.Identifier.ValueText == name.Identifier.ValueText)
+            goto Fail;
+        }
+      }
+
       var condition = (BinaryExpressionSyntax)node.Condition;
       if (!IsNumericalForVariableMatch(condition.Left, variable.Identifier)) {
         goto Fail;
@@ -1813,7 +1829,6 @@ namespace CSharpLua {
       }
 
       LuaExpressionSyntax stepExpression;
-      bool hasNoEqual;
       var increment = node.Incrementors.First();
       switch (increment.Kind()) {
         case SyntaxKind.PreIncrementExpression:
@@ -1830,12 +1845,12 @@ namespace CSharpLua {
             goto Fail;
           }
           if (increment.IsKind(SyntaxKind.PreIncrementExpression) || increment.IsKind(SyntaxKind.PostIncrementExpression)) {
-            if (!IsNumericalForLess(conditionKind, out hasNoEqual)) {
+            if (!IsNumericalForLess(conditionKind)) {
               goto Fail;
             }
             stepExpression = 1;
           } else {
-            if (!IsNumericalForGreater(conditionKind, out hasNoEqual)) {
+            if (!IsNumericalForGreater(conditionKind)) {
               goto Fail;
             }
             stepExpression = -1;
@@ -1855,11 +1870,11 @@ namespace CSharpLua {
           }
 
           if (increment.IsKind(SyntaxKind.AddAssignmentExpression)) {
-            if (!IsNumericalForLess(conditionKind, out hasNoEqual)) {
+            if (!IsNumericalForLess(conditionKind)) {
               goto Fail;
             }
           } else {
-            if (!IsNumericalForGreater(conditionKind, out hasNoEqual)) {
+            if (!IsNumericalForGreater(conditionKind)) {
               goto Fail;
             }
             if (stepExpression is LuaNumberLiteralExpressionSyntax numberLiteral) {
@@ -1881,21 +1896,18 @@ namespace CSharpLua {
       CheckLocalVariableName(ref identifier, variable);
 
       var startExpression = variable.Initializer.Value.AcceptExpression(this);
-      if (hasNoEqual) {
+
+      if (conditionKind == SyntaxKind.GreaterThanExpression) {
         if (limitExpression is LuaNumberLiteralExpressionSyntax limitLiteral) {
-          if (stepExpression is LuaNumberLiteralExpressionSyntax numberLiteral) {
-            limitExpression = new LuaIdentifierLiteralExpressionSyntax((limitLiteral.Number - numberLiteral.Number).ToString());
-          } else {
-            limitExpression = limitExpression.Sub(stepExpression);
-          }
+          limitExpression = limitLiteral.Number + 1;
         } else {
-          if (stepExpression is LuaNumberLiteralExpressionSyntax numberLiteral) {
-            limitExpression = numberLiteral.Number > 0
-              ? limitExpression.Sub(stepExpression)
-              : limitExpression.Plus((-numberLiteral.Number).ToString());
-          } else {
-            limitExpression = limitExpression.Sub(stepExpression);
-          }
+          limitExpression = limitExpression.Plus(1);
+        }
+      } else if (conditionKind == SyntaxKind.LessThanExpression) {
+        if (limitExpression is LuaNumberLiteralExpressionSyntax limitLiteral) {
+          limitExpression = limitLiteral.Number - 1;
+        } else {
+          limitExpression = limitExpression.Sub(1);
         }
       }
 
