@@ -104,6 +104,12 @@ defInf("System.ISet_1", function(T)
   }
 end)
 
+defInf("System.IReadOnlySet_1", function(T)
+  return {
+    base = { IReadOnlyCollection_1(T) }
+  }
+end)
+
 defInf("System.IComparer")
 defInf("System.IComparer_1", emptyFn)
 defInf("System.IEqualityComparer")

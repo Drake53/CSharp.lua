@@ -8,9 +8,15 @@ namespace Bridge.ClientTest.Linq
     [TestFixture(TestNameFormat = "Ordering - {0}")]
     public class TestLinqOrderingOperators
     {
-        [Test(ExpectedCount = 8)]
+        [Test(ExpectedCount = 9)]
         public static void Test()
         {
+            // TEST
+            var itemsWithNulls = new string[] { "a", null, "b", "c", null, "d", "e" };
+            var sortedItems = (from item in itemsWithNulls
+                               orderby item
+                               select item).ToArray();
+            Assert.AreDeepEqual(new[] { null, null, "a", "b", "c", "d", "e" }, sortedItems);
             // TEST
             var words = new string[] { "ab2", "ac", "a", "ab12", "", "ab", "bac", "z" };
             var sortedWords = (from word in words

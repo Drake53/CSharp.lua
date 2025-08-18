@@ -375,8 +375,7 @@ local Dictionary = (function ()
     end,
     TryAdd = function (this, key, value)
       if key == nil then throw(ArgumentNullException("key")) end
-      local exists = this:TryGetValue(key)
-      if exists then
+      if this:ContainsKey(key) then
         return false
       end
       this:set(key, value)
@@ -708,8 +707,7 @@ local ArrayDictionary = (function ()
     end,
     TryAdd = function (this, key, value)
       if key == nil then throw(ArgumentNullException("key")) end
-      local exists = this:TryGetValue(key)
-      if exists then
+      if this:ContainsKey(key) then
         return false
       end
       this:set(key, value)

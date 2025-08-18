@@ -48,7 +48,7 @@ local SortedSet = {
 
 local SortedSetFn = System.define("System.Collections.Generic.SortedSet", function(T) 
   return { 
-    base = { System.ICollection_1(T), System.IReadOnlyCollection_1(T), System.ISet_1(T) }, 
+    base = { System.ISet_1(T), System.IReadOnlySet_1(T) }, 
     __genericT__ = T,
   }
 end, SortedSet, 1)
