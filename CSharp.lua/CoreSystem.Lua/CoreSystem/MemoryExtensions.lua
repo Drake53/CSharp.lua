@@ -16,6 +16,7 @@ limitations under the License.
 
 local System = System
 local Span = System.Span
+local Array = System.Array
 
 System.MemoryExtensions = {
   AsSpan = function (array) 
@@ -25,5 +26,8 @@ System.MemoryExtensions = {
   AsBoundedSpan = function (array, start, length) 
     local SpanT = Span(array.__genericT__)
     return SpanT(array, start, length)
+  end,
+  Contains = function (span, value)
+    return Array.Contains(span._array, value)
   end
 }
