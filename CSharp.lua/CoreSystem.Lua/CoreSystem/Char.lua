@@ -73,6 +73,10 @@ local function get(s, index)
   return c
 end
 
+local function isAsciiLetter(c)
+  return (c >= 65 and c <= 90) or (c >= 97 and c <= 122)
+end
+
 local function isDigit(c, index)
   if index then
     c = get(c, index)
@@ -86,7 +90,7 @@ local function isLetter(c, index)
     c = get(c, index)
   end
   if c < 128 then
-    return (c >= 65 and c <= 90) or (c >= 97 and c <= 122)
+    return isAsciiLetter(c)
   else
     return (c >= 0x0400 and c <= 0x042F)
       or (c >= 0x03AC and c <= 0x03CE)
@@ -107,6 +111,7 @@ local Char = System.defStc("System.Char", {
   EqualsObj = Int.EqualsObj,
   GetHashCode = Int.GetHashCode,
   default = Int.default,
+  IsAsciiLetter = isAsciiLetter,
   IsControl = function (c, index)
     if index then
       c = get(c, index)
