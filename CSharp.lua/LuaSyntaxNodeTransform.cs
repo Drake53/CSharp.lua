@@ -191,6 +191,7 @@ namespace CSharpLua {
       if (block.TempCount > 0) {
         Contract.Assert(CurFunction.TempCount >= block.TempCount);
         CurFunction.TempCount -= block.TempCount;
+        block.TempCount = 0;
       }
     }
 
