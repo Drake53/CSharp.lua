@@ -14,7 +14,7 @@ local luaVersions = {
 publishOutputDir = "bin/Debug/PublishOutput/"
 
 local function publish(depth)
-  local cmd = ("dotnet publish %s --configuration Debug --output %s"):format(("../"):rep(depth), publishOutputDir)
+  local cmd = ("dotnet build %s --configuration Debug --output %s"):format(("../"):rep(depth), publishOutputDir)
   execute(cmd)
 end
 
