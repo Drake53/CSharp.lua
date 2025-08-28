@@ -503,7 +503,7 @@ namespace CSharpLua {
 
     internal void AddExportEnum(ITypeSymbol enumType) {
       Contract.Assert(enumType.TypeKind == TypeKind.Enum);
-      if (enumType.IsFromCode()) {
+      if (IsFromCode(enumType)) {
         exportEnums_.Add(enumType.ToString());
       }
     }
@@ -565,7 +565,7 @@ namespace CSharpLua {
     }
 
     internal bool IsFromLuaModule(ISymbol symbol) {
-      return symbol.IsFromCode() || IsFromModuleOnly(symbol);
+      return IsFromCode(symbol) || IsFromModuleOnly(symbol);
     }
 
     private bool IsFromModuleOnly(ISymbol symbol) {
@@ -639,19 +639,19 @@ namespace CSharpLua {
       return isExport;
     }
 
-    private static void AddSuperTypeTo(HashSet<INamedTypeSymbol> parentTypes, INamedTypeSymbol rootType, INamedTypeSymbol superType) {
+    private void AddSuperTypeTo(HashSet<INamedTypeSymbol> parentTypes, INamedTypeSymbol rootType, INamedTypeSymbol superType) {
       if (superType.IsGenericType) {
-        if (superType.OriginalDefinition.IsFromCode()) {
+        if (IsFromCode(superType.OriginalDefinition)) {
           parentTypes.Add(superType.OriginalDefinition);
         }
         foreach (var typeArgument in superType.TypeArguments) {
           if (typeArgument.Kind != SymbolKind.TypeParameter) {
-            if (typeArgument.OriginalDefinition.IsFromCode() && !typeArgument.OriginalDefinition.Is(rootType)) {
+            if (IsFromCode(typeArgument.OriginalDefinition) && !typeArgument.OriginalDefinition.Is(rootType)) {
               AddSuperTypeTo(parentTypes, rootType, (INamedTypeSymbol)typeArgument);
             }
           }
         }
-      } else if (superType.IsFromCode()) {
+      } else if (IsFromCode(superType)) {
         parentTypes.Add(superType);
       }
     }
@@ -796,7 +796,7 @@ namespace CSharpLua {
     }
 
     internal bool AddGenericImportDepend(INamedTypeSymbol definition, INamedTypeSymbol type) {
-      if (type != null && type.IsFromCode() && !definition.IsContainsType(type) && !type.IsDependExists(definition)) {
+      if (type != null && IsFromCode(type) && !definition.IsContainsType(type) && !type.IsDependExists(definition)) {
         var set = genericImportDepends_.GetOrAdd(definition, _ => new ConcurrentHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default));
         return set.Add(type);
       }
@@ -837,7 +837,7 @@ namespace CSharpLua {
     }
 
     private void TryAddExtend(INamedTypeSymbol super, INamedTypeSymbol children, bool isImplicit = false) {
-      if (super.IsFromCode()) {
+      if (IsFromCode(super)) {
         if (super.IsGenericType) {
           super = super.OriginalDefinition;
         }
@@ -871,7 +871,7 @@ namespace CSharpLua {
     }
 
     private void CheckMemberBadName(string originalString, ISymbol symbol) {
-      if (symbol.IsFromCode()) {
+      if (IsFromCode(symbol)) {
         bool isCheckNeedReserved = false;
         bool isCheckIllegalIdentifier = true;
         switch (symbol.Kind) {
@@ -1292,7 +1292,7 @@ namespace CSharpLua {
     }
 
     private bool RefactorInterfaceSymbol(ISymbol symbol, HashSet<ISymbol> alreadyRefactorSymbols) {
-      if (symbol.IsFromCode()) {
+      if (IsFromCode(symbol)) {
         INamedTypeSymbol typeSymbol = symbol.ContainingType;
         Contract.Assert(typeSymbol.TypeKind == TypeKind.Interface);
         var children = GetExtendChildren(typeSymbol);
@@ -1742,7 +1742,7 @@ namespace CSharpLua {
         return IsModuleAutoField(symbol);
       }
 
-      if (symbol.IsFromAssembly()) {
+      if (IsFromAssembly(symbol)) {
         return false;
       }
 
@@ -1777,7 +1777,7 @@ namespace CSharpLua {
         return IsModuleAutoField(symbol);
       }
 
-      if (symbol.IsFromAssembly()) {
+      if (IsFromAssembly(symbol)) {
         return false;
       }
 
@@ -1803,7 +1803,7 @@ namespace CSharpLua {
     }
 
     public bool IsMoreThanLocalVariables(ISymbol symbol) {
-      Contract.Assert(symbol.IsFromCode());
+      Contract.Assert(IsFromCode(symbol));
       return isMoreThanLocalVariables_.GetOrAdd(symbol, symbol => {
         const int kMaxLocalVariablesCount = LuaSyntaxNode.kLocalVariablesMaxCount - 5;
         var methods = symbol.ContainingType.GetMembers().Where(i => {
@@ -2191,7 +2191,7 @@ namespace CSharpLua {
     }
 
     private string GetNamespaceMapName(INamespaceSymbol symbol, string original) {
-      if (symbol.IsFromCode()) {
+      if (IsFromCode(symbol)) {
         return GetNamespaceNames(symbol.GetAllNamespaces());
       }
 
@@ -2294,7 +2294,7 @@ namespace CSharpLua {
           return GetCodeTemplateFromAttributeText(text, codeTemplateAttributeRegex_);
         }
       } else if (symbol.Kind == SymbolKind.Field) {
-        Contract.Assert(symbol.IsFromAssembly());
+        Contract.Assert(IsFromAssembly(symbol));
         return XmlMetaProvider.GetFieldMetadata(symbol.GetDocumentationCommentId());
       } else {
         string xml = symbol.GetDocumentationCommentXml();
@@ -2338,6 +2338,45 @@ namespace CSharpLua {
         return text.Trim().Trim('"');
       }
       return null;
+    }
+
+    public bool IsFromCode(ISymbol symbol) {
+      var syntaxReferences = symbol.DeclaringSyntaxReferences;
+      if (syntaxReferences.IsEmpty) {
+        return false;
+      }
+      return !HasCSharpLuaAttribute(syntaxReferences.First().GetSyntax(), LuaDocumentStatement.AttributeFlags.Ignore);
+    }
+
+    public bool IsFromAssembly(ISymbol symbol) {
+      return !IsFromCode(symbol);
+    }
+
+    public bool IsAbsoluteFromCode(ITypeSymbol symbol) {
+      if (IsFromCode(symbol)) {
+        return true;
+      }
+
+      switch (symbol.Kind) {
+        case SymbolKind.ArrayType: {
+          var arrayType = (IArrayTypeSymbol)symbol;
+          if (IsAbsoluteFromCode(arrayType.ElementType)) {
+            return true;
+          }
+          break;
+        }
+        case SymbolKind.NamedType: {
+          var nameTypeSymbol = (INamedTypeSymbol)symbol;
+          foreach (var typeArgument in nameTypeSymbol.TypeArguments) {
+            if (IsAbsoluteFromCode(typeArgument)) {
+              return true;
+            }
+          }
+          break;
+        }
+      }
+
+      return false;
     }
 
     public bool IsAutoProperty(IPropertySymbol symbol) {

@@ -446,7 +446,7 @@ namespace CSharpLua {
     }
 
     private bool IsInternalMember(ISymbol symbol) {
-      if (symbol.IsFromCode()) {
+      if (generator_.IsFromCode(symbol)) {
         bool isVirtual = symbol.IsOverridable() && !generator_.IsSealed(symbol.ContainingType);
         if (!isVirtual) {
           var typeSymbol = CurTypeSymbol;
@@ -1009,7 +1009,7 @@ namespace CSharpLua {
             string newPrefix = prefix.Replace(".", "");
             CheckNewPrefix(ref newPrefix, prefix);
             if (!IsLocalVarExistsInCurMethod(newPrefix)) {
-              bool success = AddImport(prefix, newPrefix, symbol.IsFromCode());
+              bool success = AddImport(prefix, newPrefix, generator_.IsFromCode(symbol));
               if (success) {
                 string newName = newPrefix + name[pos..];
                 return new LuaImportNameSyntax(newName, name);
@@ -1055,10 +1055,10 @@ namespace CSharpLua {
         bool success = false;
         if (!symbol.IsTypeParameterExists()) {
           if (!IsLocalVarExistsInCurMethod(newName)) {
-            success = AddGenericImport(invocationExpression, newName, argumentTypeNames, symbol.IsAbsoluteFromCode());
+            success = AddGenericImport(invocationExpression, newName, argumentTypeNames, generator_.IsAbsoluteFromCode(symbol));
           }
         } else {
-          success = CurTypeDeclaration.TypeDeclaration.AddGenericImport(invocationExpression, newName, argumentTypeNames, symbol.IsAbsoluteFromCode(), out var declare);
+          success = CurTypeDeclaration.TypeDeclaration.AddGenericImport(invocationExpression, newName, argumentTypeNames, generator_.IsAbsoluteFromCode(symbol), out var declare);
           if (declare != null) {
             CheckGenericDeclareTypeArgument(declare, invocationExpression, symbol);
             bool hasAdd = generator_.AddGenericImportDepend(CurTypeDeclaration.TypeSymbol, symbol.OriginalDefinition as INamedTypeSymbol);
@@ -1084,7 +1084,7 @@ namespace CSharpLua {
         if (symbol is INamedTypeSymbol nameTypeSymbol) {
           int i = 0;
           foreach (var typeArgument in nameTypeSymbol.TypeArguments) {
-            if (typeArgument.Kind != SymbolKind.TypeParameter && typeArgument.IsFromCode()) {
+            if (typeArgument.Kind != SymbolKind.TypeParameter && generator_.IsFromCode(typeArgument)) {
               var argumentExpression = invocation.ArgumentList.Arguments[i];
               if (argumentExpression is LuaIdentifierNameSyntax identifier) {
                 string name = identifier.ValueText;
@@ -1322,7 +1322,7 @@ namespace CSharpLua {
 
               if (argument.Parent.IsKind(SyntaxKind.ArgumentList)) {
                 if (semanticModel_.GetSymbolInfo(argument.Parent.Parent).Symbol is IMethodSymbol symbol) {
-                  if (symbol.IsFromAssembly() && !symbol.ContainingType.IsCollectionType()) {
+                  if (generator_.IsFromAssembly(symbol) && !symbol.ContainingType.IsCollectionType()) {
                     break;
                   }
 
@@ -1344,7 +1344,7 @@ namespace CSharpLua {
               var assignment = (AssignmentExpressionSyntax)node.Parent;
               if (assignment.Right == node) {
                 var symbol = semanticModel_.GetSymbolInfo(assignment.Left).Symbol;
-                if (symbol != null && symbol.IsFromAssembly()) {
+                if (symbol != null && generator_.IsFromAssembly(symbol)) {
                   break;
                 }
 

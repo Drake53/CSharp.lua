@@ -318,7 +318,7 @@ namespace CSharpLua {
         bool isBaseImplementation = typeSymbol.BaseType != null && typeSymbol.BaseType.AllInterfaces.Any(i => i.IsGenericIEnumerableType());
         if (!isBaseImplementation) {
           var argumentType = interfaceType.TypeArguments.First();
-          bool isLazy = argumentType.Kind != SymbolKind.TypeParameter && argumentType.IsFromCode();
+          bool isLazy = argumentType.Kind != SymbolKind.TypeParameter && generator_.IsFromCode(argumentType);
           var typeName = isLazy ? GetTypeNameWithoutImport(argumentType) : GetTypeName(argumentType);
           return new LuaSpecialGenericType {
             Name = LuaIdentifierNameSyntax.GenericT,

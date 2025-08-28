@@ -338,7 +338,7 @@ namespace CSharpLua {
       ctorCounter = 0;
       var baseType = typeSymbol.BaseType;
       if (baseType != null && !baseType.IsSystemObjectOrValueType()) {
-        if (baseType.IsFromCode()) {
+        if (generator_.IsFromCode(baseType)) {
           if (baseType.InstanceConstructors.Length > 1) {
             ctorCounter = 1;
           }

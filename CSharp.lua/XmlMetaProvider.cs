@@ -366,7 +366,7 @@ namespace CSharpLua {
             case 'F':
               var field = new XmlMetaModel.FieldModel();
               field.name = GetShortName(fullName);
-              field.Template = Utility.TryGetCodeTemplateFromAttributeText(member.node?.FirstOrDefault()?.InnerText);
+              field.Template = LuaSyntaxGenerator.TryGetCodeTemplateFromAttributeText(member.node?.FirstOrDefault()?.InnerText);
               fieldMetadata_.Add(member.name, field.Template);
               var container = GetContainer(fullName);
               TryAddClass(container);
@@ -378,7 +378,7 @@ namespace CSharpLua {
             case 'M':
               var method = new XmlMetaModel.MethodModel();
               method.name = GetShortName(fullName);
-              method.Template = Utility.TryGetCodeTemplateFromAttributeText(member.node?.FirstOrDefault()?.InnerText);
+              method.Template = LuaSyntaxGenerator.TryGetCodeTemplateFromAttributeText(member.node?.FirstOrDefault()?.InnerText);
               method.ArgCount = parameters?.Length ?? -1;
               if (method.ArgCount > 0) {
                 method.Args = parameters.Select(param => {
@@ -524,7 +524,7 @@ namespace CSharpLua {
     }
 
     internal bool MayHaveCodeMeta(ISymbol symbol) {
-      return symbol.DeclaredAccessibility == Accessibility.Public && symbol.IsFromAssembly();
+      return symbol.DeclaredAccessibility == Accessibility.Public && generator_.IsFromAssembly(symbol);
     }
 
     private string GetTypeShortString(ISymbol symbol) {
@@ -618,7 +618,7 @@ namespace CSharpLua {
       }
 
       string metaInfo = null;
-      if (symbol.IsFromAssembly()) {
+      if (generator_.IsFromAssembly(symbol)) {
         metaInfo = GetTypeMetaInfo(symbol)?.GetMethodMetaInfo(symbol.Name)?.GetMetaInfo(symbol, metaType);
       }
 

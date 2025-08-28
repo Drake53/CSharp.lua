@@ -515,18 +515,6 @@ namespace CSharpLua {
       return Array.Empty<T>();
     }
 
-    public static bool IsFromCode(this ISymbol symbol) {
-      var syntaxReferences = symbol.DeclaringSyntaxReferences;
-      if (syntaxReferences.IsEmpty) {
-        return false;
-      }
-      return !HasCSharpLuaAttribute(syntaxReferences.First().GetSyntax(), LuaDocumentStatement.AttributeFlags.Ignore);
-    }
-
-    public static bool IsFromAssembly(this ISymbol symbol) {
-      return !symbol.IsFromCode();
-    }
-
     public static bool IsOverridable(this ISymbol symbol) {
       return !symbol.IsStatic && (symbol.IsAbstract || symbol.IsVirtual || symbol.IsOverride);
     }
@@ -1077,33 +1065,6 @@ namespace CSharpLua {
           var pointType = (IPointerTypeSymbol)symbol;
           if (pointType.PointedAtType.IsTypeParameterExists(matchType)) {
             return true;
-          }
-          break;
-        }
-      }
-
-      return false;
-    }
-
-    public static bool IsAbsoluteFromCode(this ITypeSymbol symbol) {
-      if (symbol.IsFromCode()) {
-        return true;
-      }
-
-      switch (symbol.Kind) {
-        case SymbolKind.ArrayType: {
-          var arrayType = (IArrayTypeSymbol)symbol;
-          if (arrayType.ElementType.IsAbsoluteFromCode()) {
-            return true;
-          }
-          break;
-        }
-        case SymbolKind.NamedType: {
-          var nameTypeSymbol = (INamedTypeSymbol)symbol;
-          foreach (var typeArgument in nameTypeSymbol.TypeArguments) {
-            if (typeArgument.IsAbsoluteFromCode()) {
-              return true;
-            }
           }
           break;
         }
