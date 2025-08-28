@@ -69,7 +69,7 @@ namespace CSharpLua {
       var globalPackageDirectory = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), @".nuget\packages");
 
       // TODO: handle case where package has multiple target frameworks
-      var sourceFilesDirectory = Path.Combine(globalPackageDirectory, name, version/*, @"contentFiles\cs\netstandard1.0"*/);
+      var sourceFilesDirectory = Path.Combine(globalPackageDirectory, name, version/*, @"contentFiles\cs\netstandard2.0"*/);
 
       return Directory.EnumerateFiles(sourceFilesDirectory, "*.cs", SearchOption.AllDirectories);
     }

@@ -21,6 +21,9 @@ namespace CSharpLua.CoreSystem {
       yield return Path.Combine(CoreSystemDirectory, @"Common.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Collections\EqualityComparer.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Array.lua");
+      yield return Path.Combine(CoreSystemDirectory, @"Span.lua");
+      yield return Path.Combine(CoreSystemDirectory, @"MemoryExtensions.lua");
+      yield return Path.Combine(CoreSystemDirectory, @"ReadOnlySpan.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Type.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Collections\List.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Collections\Dictionary.lua");
@@ -47,6 +50,7 @@ namespace CSharpLua.CoreSystem {
       yield return Path.Combine(CoreSystemDirectory, @"Globalization\Globalization.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Numerics\HashCodeHelper.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Numerics\Complex.lua");
+      yield return Path.Combine(CoreSystemDirectory, @"Numerics\Vector.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Numerics\Vector2.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Numerics\Vector3.lua");
       yield return Path.Combine(CoreSystemDirectory, @"Numerics\Vector4.lua");

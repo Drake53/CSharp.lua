@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>CSharpLua.CoreSystem</RootNamespace>
   </PropertyGroup>
 
@@ -45,196 +45,212 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Natives.lua" Link="CoreSystem\Natives.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
-      <Pack>true</Pack>
-    </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Array.lua" Link="CoreSystem\Array.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Boolean.lua" Link="CoreSystem\Boolean.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Char.lua" Link="CoreSystem\Char.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\Dictionary.lua" Link="CoreSystem\Collections\Dictionary.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\EqualityComparer.lua" Link="CoreSystem\Collections\EqualityComparer.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\HashSet.lua" Link="CoreSystem\Collections\HashSet.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\LinkedList.lua" Link="CoreSystem\Collections\LinkedList.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\Linq.lua" Link="CoreSystem\Collections\Linq.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\List.lua" Link="CoreSystem\Collections\List.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\PriorityQueue.lua" Link="CoreSystem\Collections\PriorityQueue.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\Queue.lua" Link="CoreSystem\Collections\Queue.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\SortedDictionary.lua" Link="CoreSystem\Collections\SortedDictionary.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\SortedList.lua" Link="CoreSystem\Collections\SortedList.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\SortedSet.lua" Link="CoreSystem\Collections\SortedSet.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Collections\Stack.lua" Link="CoreSystem\Collections\Stack.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Common.lua" Link="CoreSystem\Common.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Console.lua" Link="CoreSystem\Console.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Convert.lua" Link="CoreSystem\Convert.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Core.lua" Link="CoreSystem\Core.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\DateTime.lua" Link="CoreSystem\DateTime.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Delegate.lua" Link="CoreSystem\Delegate.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Enum.lua" Link="CoreSystem\Enum.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Exception.lua" Link="CoreSystem\Exception.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Globalization\Globalization.lua" Link="CoreSystem\Globalization\Globalization.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Interfaces.lua" Link="CoreSystem\Interfaces.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\IO\File.lua" Link="CoreSystem\IO\File.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Math.lua" Link="CoreSystem\Math.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\MemoryExtensions.lua" Link="CoreSystem\MemoryExtensions.lua">
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Natives.lua" Link="CoreSystem\Natives.lua">
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Number.lua" Link="CoreSystem\Number.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Complex.lua" Link="CoreSystem\Numerics\Complex.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\HashCodeHelper.lua" Link="CoreSystem\Numerics\HashCodeHelper.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Matrix3x2.lua" Link="CoreSystem\Numerics\Matrix3x2.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Matrix4x4.lua" Link="CoreSystem\Numerics\Matrix4x4.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Plane.lua" Link="CoreSystem\Numerics\Plane.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Quaternion.lua" Link="CoreSystem\Numerics\Quaternion.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Vector.lua" Link="CoreSystem\Numerics\Vector.lua">
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Vector2.lua" Link="CoreSystem\Numerics\Vector2.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Vector3.lua" Link="CoreSystem\Numerics\Vector3.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Numerics\Vector4.lua" Link="CoreSystem\Numerics\Vector4.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Random.lua" Link="CoreSystem\Random.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\ReadOnlySpan.lua" Link="CoreSystem\ReadOnlySpan.lua">
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Reflection\Assembly.lua" Link="CoreSystem\Reflection\Assembly.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
+      <Pack>true</Pack>
+    </Content>
+    <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Span.lua" Link="CoreSystem\Span.lua">
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\String.lua" Link="CoreSystem\String.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Text\StringBuilder.lua" Link="CoreSystem\Text\StringBuilder.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Threading\Task.lua" Link="CoreSystem\Threading\Task.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Threading\Thread.lua" Link="CoreSystem\Threading\Thread.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Threading\Timer.lua" Link="CoreSystem\Threading\Timer.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\TimeSpan.lua" Link="CoreSystem\TimeSpan.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Type.lua" Link="CoreSystem\Type.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
     <Content Update="..\CSharp.lua\CoreSystem.Lua\CoreSystem\Utilities.lua" Link="CoreSystem\Utilities.lua">
-      <PackagePath>contentFiles\any\netstandard1.0\CoreSystem</PackagePath>
+      <PackagePath>contentFiles\any\netstandard2.0\CoreSystem</PackagePath>
       <Pack>true</Pack>
     </Content>
   </ItemGroup>
