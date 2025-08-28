@@ -257,10 +257,12 @@ namespace CSharpLua {
       }
     }
 
+    private readonly LuaSyntaxGenerator generator_;
     private readonly Dictionary<string, XmlMetaModel.NamespaceModel> namespaceNameMaps_ = new();
     private readonly Dictionary<string, TypeMetaInfo> typeMetas_ = new();
 
-    public XmlMetaProvider(IEnumerable<Stream> streams) {
+    public XmlMetaProvider(LuaSyntaxGenerator generator, IEnumerable<Stream> streams) {
+      generator_ = generator;
       currentXmlMetaProvider_ = this;
 
       using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(MetaResources.System))) {
@@ -577,7 +579,7 @@ namespace CSharpLua {
     }
 
     public string GetFieldCodeTemplate(IFieldSymbol symbol) {
-      return GetFieldMetaInfo(symbol)?.Template ?? symbol.GetCodeTemplateFromAttribute();
+      return GetFieldMetaInfo(symbol)?.Template ?? generator_.GetCodeTemplateFromAttribute(symbol);
     }
 
     public bool IsFieldForceProperty(IFieldSymbol symbol) {
@@ -650,7 +652,7 @@ namespace CSharpLua {
     }
 
     public string GetMethodCodeTemplate(IMethodSymbol symbol) {
-      return GetMethodMetaInfo(symbol, MethodMetaType.CodeTemplate) ?? symbol.GetCodeTemplateFromAttribute();
+      return GetMethodMetaInfo(symbol, MethodMetaType.CodeTemplate) ?? generator_.GetCodeTemplateFromAttribute(symbol);
     }
 
     public bool IsMethodIgnoreGeneric(IMethodSymbol symbol) {

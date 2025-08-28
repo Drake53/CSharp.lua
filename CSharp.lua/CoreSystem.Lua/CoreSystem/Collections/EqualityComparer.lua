@@ -19,6 +19,7 @@ local define = System.define
 local throw = System.throw
 local equalsObj = System.equalsObj
 local compareObj = System.compareObj
+local hashObj = System.hashObj
 local ArgumentException = System.ArgumentException
 local ArgumentNullException = System.ArgumentNullException
 
@@ -26,24 +27,13 @@ local type = type
 
 local EqualityComparer
 EqualityComparer = define("System.EqualityComparer", function (T)
-  local equals
-  local Equals = T.Equals
-  if Equals then
-    if T.class == 'S' then
-      equals = Equals 
-    else
-      equals = function (x, y) 
-        return x:Equals(y) 
-      end 
-    end
+  local equals, getHashCode
+  if T.class == 'S' then
+    equals = T.Equals or equalsObj
+    getHashCode = T.GetHashCode
   else
-    equals = equalsObj
-  end
-  local function getHashCode(x)
-    if type(x) == "table" then
-      return x:GetHashCode()
-    end
-    return x
+    equals = T.Equals and function (x, y) return x:Equals(y) end or equalsObj
+    getHashCode = hashObj
   end
   local defaultComparer
   return {
@@ -127,8 +117,8 @@ Comparer = define("System.Comparer_1", function (T)
     end
     Compare = function (this, x, y)
       if x ~= nil then
-        if y ~= nil then 
-          return compareTo(x, y) 
+        if y ~= nil then
+          return compareTo(x, y)
         end
         return 1
       end                 
@@ -141,7 +131,7 @@ Comparer = define("System.Comparer_1", function (T)
 
   local defaultComparer
   local function getDefault()
-    local comparer = defaultComparer 
+    local comparer = defaultComparer
     if comparer == nil then
       comparer = Comparer(T)()
       defaultComparer = comparer
@@ -156,7 +146,7 @@ Comparer = define("System.Comparer_1", function (T)
 
   return {
     __genericT__ = T,
-    base = { System.IComparer_1(T), System.IComparer }, 
+    base = { System.IComparer_1(T), System.IComparer },
     getDefault = getDefault,
     getDefaultInvariant = getDefault,
     Compare = Compare,

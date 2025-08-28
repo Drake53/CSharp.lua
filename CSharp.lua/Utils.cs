@@ -435,7 +435,7 @@ namespace CSharpLua {
 
     public static bool IsNullableWithBasicElementType(this ITypeSymbol type) {
       return type.IsNullableType(out var elementType)
-             && (elementType.IsBasicType() || type.SpecialType == SpecialType.System_DateTime || type.IsTimeSpanType());
+             && (elementType.IsBasicType() || elementType.TypeKind == TypeKind.Enum || type.SpecialType == SpecialType.System_DateTime || type.IsTimeSpanType());
     }
 
     public static bool IsEnumType(this ITypeSymbol type, out ITypeSymbol symbol, out bool isNullable) {
@@ -564,95 +564,6 @@ namespace CSharpLua {
       }
     }
 
-    public static bool HasMetadataAttribute(this ISymbol symbol) {
-      var node = symbol.GetDeclaringSyntaxNode();
-      if (node != null) {
-        return node.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.Metadata);
-      }
-      return false;
-    }
-
-    public static bool HasParamsAttribute(this ISymbol symbol) {
-      var node = symbol.GetDeclaringSyntaxNode();
-      if (node != null) {
-        return node.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.Params);
-      }
-      return false;
-    }
-
-    public static bool HasCSharpLuaAttribute(this SyntaxNode node, LuaDocumentStatement.AttributeFlags attribute) {
-      return node.HasCSharpLuaAttribute(attribute, out _);
-    }
-
-    public static bool HasCSharpLuaAttribute(this SyntaxNode node, LuaDocumentStatement.AttributeFlags attribute, out string text) {
-      text = null;
-      var documentTrivia = node.GetLeadingTrivia().FirstOrDefault(i => i.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
-      if (documentTrivia != default) {
-        string document = documentTrivia.ToString();
-        if (document.Contains(LuaDocumentStatement.ToString(attribute))) {
-          text = document;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public static string GetCodeTemplateFromAttribute(this ISymbol symbol) {
-      var node = symbol.GetDeclaringSyntaxNode();
-      if (node != null) {
-        if (symbol.Kind == SymbolKind.Field) {
-          node = node.Parent.Parent;
-        }
-        if (node.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.Template, out string text)) {
-          return GetCodeTemplateFromAttributeText(text, codeTemplateAttributeRegex_);
-        }
-      } else if (symbol.Kind == SymbolKind.Field) {
-        Contract.Assert(symbol.IsFromAssembly());
-        return XmlMetaProvider.GetFieldMetadata(symbol.GetDocumentationCommentId());
-      } else {
-        string xml = symbol.GetDocumentationCommentXml();
-        if (xml != null) {
-          return GetCodeTemplateFromAttributeText(xml, codeTemplateAttributeRegex_);
-        }
-      }
-      return null;
-    }
-
-    public static (string get, string set) GetPropertyTemplateFromAttribute(this ISymbol symbol) {
-      var node = symbol.GetDeclaringSyntaxNode();
-      string get = null;
-      string set = null;
-      if (node != null) {
-        if (symbol.Kind == SymbolKind.Field) {
-          node = node.Parent.Parent;
-        }
-        if (node.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.Get, out string getText)) {
-          get = GetCodeTemplateFromAttributeText(getText, codeGetAttributeRegex_);
-        }
-        if (node.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.Set, out string setText)) {
-          set = GetCodeTemplateFromAttributeText(setText, codeSetAttributeRegex_);
-        }
-      }
-      return (get, set);
-    }
-
-    private static readonly Regex codeTemplateAttributeRegex_ = new(@"@CSharpLua.Template\s*=\s*(.+)\s*", RegexOptions.Compiled);
-    private static readonly Regex codeGetAttributeRegex_ = new(@"@CSharpLua.Get\s*=\s*(.+)\s*", RegexOptions.Compiled);
-    private static readonly Regex codeSetAttributeRegex_ = new(@"@CSharpLua.Set\s*=\s*(.+)\s*", RegexOptions.Compiled);
-
-    internal static string TryGetCodeTemplateFromAttributeText(string document) {
-      return document is null ? null : GetCodeTemplateFromAttributeText(document, codeTemplateAttributeRegex_);
-    }
-
-    private static string GetCodeTemplateFromAttributeText(string document, Regex regex) {
-      var matches = regex.Matches(document);
-      if (matches.Count > 0) {
-        string text = matches[0].Groups[1].Value;
-        return text.Trim().Trim('"');
-      }
-      return null;
-    }
-
     public static bool IsAssignment(this SyntaxKind kind) {
       return kind is >= SyntaxKind.SimpleAssignmentExpression and <= SyntaxKind.RightShiftAssignmentExpression;
     }
@@ -662,7 +573,15 @@ namespace CSharpLua {
     }
 
     public static bool IsTypeDeclaration(this SyntaxKind kind) {
-      return kind is >= SyntaxKind.ClassDeclaration and <= SyntaxKind.EnumDeclaration;
+      return kind switch {
+        SyntaxKind.ClassDeclaration 
+        or SyntaxKind.StructDeclaration 
+        or SyntaxKind.InterfaceDeclaration 
+        or SyntaxKind.EnumDeclaration 
+        or SyntaxKind.RecordDeclaration 
+        or SyntaxKind.RecordStructDeclaration => true,
+        _ => false,
+      };
     }
 
     public static bool IsLiteralExpression(this SyntaxKind kind) {
@@ -792,7 +711,7 @@ namespace CSharpLua {
 
     private static void CheckSymbolDefinition<T>(ref T symbol) where T : class, ISymbol {
       var originalDefinition = (T)symbol.OriginalDefinition;
-      if (originalDefinition != symbol) {
+      if (!originalDefinition.EQ(symbol)) {
         symbol = originalDefinition;
       }
     }
@@ -984,55 +903,6 @@ namespace CSharpLua {
       return false;
     }
 
-    public static bool IsAutoProperty(this IPropertySymbol symbol) {
-      var node = symbol.GetDeclaringSyntaxNode();
-      if (node != null) {
-        switch (node.Kind()) {
-          case SyntaxKind.PropertyDeclaration: {
-            var property = (PropertyDeclarationSyntax)node;
-            bool hasGet = false;
-            bool hasSet = false;
-            if (property.AccessorList != null) {
-              foreach (var accessor in property.AccessorList.Accessors) {
-                if (accessor.Body != null || accessor.ExpressionBody != null) {
-                  if (accessor.IsKind(SyntaxKind.GetAccessorDeclaration)) {
-                    Contract.Assert(!hasGet);
-                    hasGet = true;
-                  } else {
-                    Contract.Assert(!hasSet);
-                    hasSet = true;
-                  }
-                }
-              }
-            } else {
-              Contract.Assert(!hasGet);
-              hasGet = true;
-            }
-            bool isField = !hasGet && !hasSet;
-            if (isField) {
-              if (property.HasCSharpLuaAttribute(LuaDocumentStatement.AttributeFlags.NoField)) {
-                isField = false;
-              }
-            }
-            return isField;
-          }
-          case SyntaxKind.IndexerDeclaration: {
-            return false;
-          }
-          case SyntaxKind.AnonymousObjectMemberDeclarator: {
-            return true;
-          }
-          case SyntaxKind.Parameter: {
-            return true;
-          }
-          default: {
-            throw new InvalidOperationException();
-          }
-        }
-      }
-      return false;
-    }
-
     private static readonly Regex identifierRegex_ = new(@"^[a-zA-Z_][a-zA-Z0-9_]*$", RegexOptions.Compiled);
 
     public static bool IsIdentifierIllegal(ref string identifierName) {
@@ -1095,11 +965,11 @@ namespace CSharpLua {
       INamedTypeSymbol typeSymbol,
       Func<INamespaceSymbol, string, string> funcOfNamespace,
       Func<INamedTypeSymbol, string> funcOfTypeName,
-      LuaSyntaxNodeTransform transfor = null) {
+      LuaSyntaxNodeTransform transform = null) {
       var externalType = typeSymbol.ContainingType;
       if (externalType != null) {
-        if (transfor is {IsNoneGenericTypeCounter: true} && !externalType.IsGenericType && !typeSymbol.IsGenericType) {
-          var curTypeDeclaration = transfor.CurTypeDeclaration;
+        if (transform?.IsNoneGenericTypeCounter == true && !externalType.IsGenericType && !typeSymbol.IsGenericType) {
+          var curTypeDeclaration = transform.CurTypeDeclaration;
           if (curTypeDeclaration != null && curTypeDeclaration.CheckTypeName(externalType, out var classIdentifier)) {
             sb.Append(classIdentifier.ValueText);
             sb.Append('.');
@@ -1125,9 +995,9 @@ namespace CSharpLua {
       this INamedTypeSymbol typeSymbol,
       Func<INamespaceSymbol, string, string> funcOfNamespace = null,
       Func<INamedTypeSymbol, string> funcOfTypeName = null,
-      LuaSyntaxNodeTransform transfor = null) {
+      LuaSyntaxNodeTransform transform = null) {
       StringBuilder sb = new StringBuilder();
-      FillExternalTypeName(sb, typeSymbol, funcOfNamespace, funcOfTypeName, transfor);
+      FillExternalTypeName(sb, typeSymbol, funcOfNamespace, funcOfTypeName, transform);
       string typeName = funcOfTypeName?.Invoke(typeSymbol);
       if (typeName != null) {
         sb.Append(typeName);

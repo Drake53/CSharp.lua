@@ -79,8 +79,8 @@ local function xpcallErr(e)
   return e
 end
 
-local function try(try, catch, finally)
-  local ok, status, result = xpcall(try, xpcallErr)
+local function try(tryFn, catch, finally)
+  local ok, status, result = xpcall(tryFn, xpcallErr)
   if not ok then
     if catch then
       if finally then
@@ -138,7 +138,8 @@ end
 local function multiKey(t, f, ...)
   local n, i, k = select("#", ...), 1
   while true do
-    local arg = assert(select(i, ...))
+    local arg = select(i, ...)
+    if not arg then error(i .. " is nil") end
     if f then
       k = f(arg)
     else
@@ -461,6 +462,7 @@ System = {
   trueFn = trueFn,
   identityFn = identityFn,
   lengthFn = lengthFn,
+  nilFn = nilFn,
   zeroFn = zeroFn,
   oneFn = oneFn,
   equals = equals,
@@ -496,9 +498,14 @@ System.luaVersion = version
   local bnot, band, bor, xor, sl, sr
   local bit = rawget(global, "bit")
   if not bit then
-    local ok, b = pcall(require, "bit")
-    if ok then
-      bit = b
+    local b32 = rawget(global, "bit32")
+    if not b32 then
+      local ok, b = pcall(require, "bit")
+      if ok then
+        bit = b
+      end
+    else
+      bit = b32
     end
   end
   if bit then
@@ -733,6 +740,14 @@ else
   function System.mod(x, y)
     local v = x % y
     if v ~= 0 and 1.0 * x * y < 0 then
+      return v - y
+    end
+    return v
+  end
+
+  function System.modf(x, y)
+    local v = x % y
+    if v ~= 0 and x * y < 0 then
       return v - y
     end
     return v
@@ -1153,8 +1168,59 @@ else
   end
 end
 
+local addr
+if version <= 5.1 then
+  addr = function (t, i)
+    return ssub(tostring(t), i or 8) + 0
+  end
+else
+  addr = function (t, i)
+    return tonumber("0x" .. ssub(tostring(t), i or 8))
+  end
+end
+
+local function hash(v)
+  if v == nil then return 0 end
+  local t = type(v)
+  if t == "number" then
+    if v % 1 == 0 and v >= -2147483648 and v <= 2147483647 then
+      return v
+    end
+    local s = tostring(v)
+    return s:GetHashCode()
+ elseif t == "string" then
+    local c = 0
+    for i = 1, #v do
+      local b = v:byte(i)
+      c = 31 * c + b
+      c = System.toInt32(c)
+    end
+    return c
+  elseif t == "boolean" then
+    return v and 1 or 0
+  elseif t == "function" then
+    return addr(v, 11)
+  end
+  return addr(v)
+end
+
+local function hashObj(obj)
+  if obj == nil then return 0 end
+  local t = type(obj)
+  if t == "table" then
+    return obj:GetHashCode()
+  end
+  return hash(obj)
+end
+
+System.hasHash = function (t)
+  return t.GetHashCode ~= hash
+end
+
 System.equalsObj = equalsObj
 System.compareObj = compareObj
+System.hash = hash
+System.hashObj = hashObj
 System.toString = toString
 
 Object = defCls("System.Object", {
@@ -1164,7 +1230,7 @@ Object = defCls("System.Object", {
   class = "C",
   EqualsObj = equals,
   ReferenceEquals = rawequal,
-  GetHashCode = identityFn,
+  GetHashCode = hash,
   EqualsStatic = equalsObj,
   GetType = false,
   ToString = function(this) return this.__name__ end
@@ -1206,6 +1272,7 @@ ValueType = defCls("System.ValueType", {
     end
   end,
   EqualsObj = function (this, obj)
+    if this == obj then return true end
     if getmetatable(this) ~= getmetatable(obj) then return false end
     for k, v in pairs(this) do
       if not equalsObj(v, obj[k]) then
@@ -1215,7 +1282,12 @@ ValueType = defCls("System.ValueType", {
     return true
   end,
   GetHashCode = function (this)
-    throw(System.NotSupportedException(this.__name__ .. " User-defined struct not support GetHashCode"), 1)
+    local c = 17
+    for _, v in pairs(this) do
+      c = c * 31 + hash(v)
+      c = System.toInt32(c)
+    end
+    return c
   end
 })
 
@@ -1328,25 +1400,37 @@ local Tuple = defCls("System.Tuple", {
 local tupleMetaTable = setmetatable({ __index  = Object, __call = tupleCreate }, Object)
 setmetatable(Tuple, tupleMetaTable)
 
-local ValueTuple = defStc("System.ValueTuple", {
+local ValueTuple = {
   Deconstruct = tupleDeconstruct,
   ToString = tupleToString,
-  __eq = tupleEquals,
   Equals = tupleEquals,
   EqualsObj = tupleEqualsObj,
   CompareTo = tupleCompareTo,
   CompareToObj = tupleCompareToObj,
   getLength = tupleLength,
   get = tupleGet,
-  default = function ()
-    throw(System.NotSupportedException("not support default(T) when T is ValueTuple"))
+  default = function (T)
+    local genericT = T.__genericT__
+    local t, n = {}, #genericT
+    for i = 1, n do
+      t[i] = genericT[i]:default()
+    end
+    t.n = n
+    return setmetatable(t, T)
   end
-})
+}
 
-local valueTupleMetaTable = setmetatable({ __index  = ValueType, __call = tupleCreate }, ValueType)
-setmetatable(ValueTuple, valueTupleMetaTable)
+local ValueTupleFn = defStc("System.ValueTuple", function (...)
+  return {
+    __eq = tupleEquals,
+    __genericT__ = { ... },
+  }
+end, ValueTuple, '')
+ValueTuple.__call = tupleCreate
+System.ValueTuple = ValueTupleFn
 
 local function recordEquals(t, other)
+  if t == other then return true end
   if getmetatable(t) == getmetatable(other) then
     for k, v in pairs(t) do
       if not equalsObj(v, other[k]) then
@@ -1356,6 +1440,10 @@ local function recordEquals(t, other)
     return true
   end
   return false
+end
+
+local function recordNotEquals(t, other)
+  return not recordEquals(t, other)
 end
 
 local function recordPrintMembers(this, builder)
@@ -1418,6 +1506,9 @@ end
 defCls("System.RecordType", {
   __eq = recordEquals,
   __clone__ = ValueType.__clone__,
+  op_Equality = recordEquals,
+  op_Inequality = recordNotEquals,
+  GetHashCode = ValueType.GetHashCode,
   Equals = recordEquals,
   PrintMembers = recordPrintMembers,
   ToString = recordToString,
@@ -1426,6 +1517,8 @@ defCls("System.RecordType", {
 
 defStc("System.RecordValueType", {
   __eq = recordEquals,
+  op_Equality = recordEquals,
+  op_Inequality = recordNotEquals,
   Equals = recordEquals,
   PrintMembers = recordPrintMembers,
   ToString = recordToString,
@@ -1451,7 +1544,7 @@ local Nullable = {
     if type(this) == "table" then
       return this:GetHashCode()
     end
-    return this
+    return hash(this)
   end,
   clone = function (t)
     if type(t) == "table" then
@@ -1505,7 +1598,7 @@ setmetatable(Index, {
 local function pointerAddress(p)
   local address = p[3]
   if address == nil then
-    address = ssub(tostring(p), 7)
+    address = addr(p)
     p[3] = address
   end
   return address + p[2]

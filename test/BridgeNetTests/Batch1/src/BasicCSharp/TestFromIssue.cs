@@ -101,6 +101,65 @@ namespace Bridge.ClientTest.BasicCSharp
             Assert.AreEqual(d.Count, 1);
         }
 
+        [Test]
+        public static void TestOf457()
+        {
+            var d = new Location[1];
+            // broken
+            var x = d.Select(c => (A: 1, c));
+            // broken
+            var y = d.Select(c => (A: 1, B: c));
+            // broken
+            var z = d.Select(c => new { A = 1, B = c });
+        }
+
+        [Test]
+        public static void TestOf458()
+        {
+            var aLocations = new Location[0];
+            var bLocations = new Location[0];
+            var lines = aLocations
+                .SelectMany(al => bLocations.Where(bl => al.X == bl.X || al.Y == bl.Y).Select(bl => (A: al, B: bl)))
+                .ToList();
+        }
+
+        [Test]
+        public static void TestOf441() 
+        {
+             var input = "aGVsbG8gd29ybGQ=";
+             var bytes = Convert.FromBase64String(input);
+             Assert.AreEqual(input, Convert.ToBase64String(bytes));
+        }
+
+        [Test]
+        public static void TestOf475() 
+        {
+            var result = new Result();
+            Assert.AreEqual(result.Goal.HasValue, false);
+        }
+
+        [Test]
+        public static void TestOf472()
+        {
+            Assert.AreEqual(LuaContext.Instance, 1);
+            Assert.AreEqual(Context.Instance, 1);
+            LuaContext.Instance += 1;
+
+            Assert.AreEqual(LuaContext.Instance, 2);
+            Assert.AreEqual(Context.Instance, 2);
+        }
+
+        [Test]
+        public static void TestOf511() {
+            Assert.AreEqual(TestFlag.None.HasFlag(TestFlag.None), true);
+            Assert.AreEqual(TestFlag.None.HasFlag(TestFlag.A), false);
+            Assert.AreEqual(TestFlag.A.HasFlag(TestFlag.None), true);
+            Assert.AreEqual(TestFlag.A.HasFlag(TestFlag.A), true);
+            Assert.AreEqual(TestFlag.A.HasFlag(TestFlag.A | TestFlag.B), false);
+            Assert.AreEqual((TestFlag.A | TestFlag.B).HasFlag(TestFlag.A), true);
+            Assert.AreEqual((TestFlag.A | TestFlag.B).HasFlag(TestFlag.A | TestFlag.C), false);
+        }
+
         private class BattleModelSlotPrototype {
             public string a;
             public string b;
@@ -143,5 +202,43 @@ namespace Bridge.ClientTest.BasicCSharp
         private static int b_ { get { return a_; } }
         private static DateTime d_;
         private static void f() {}
+    }
+
+    public struct Location
+    {
+        public Location(int x, int y) {
+            X = x;
+            Y = y;
+        }
+
+        public int X;
+        public int Y;
+    }
+
+    public class Result
+    {
+        public Location? Goal { get; set; }
+    }
+
+    public abstract class Context
+    {
+        internal static int Instance = 0;
+    }
+
+    public class LuaContext : Context
+    {
+        static LuaContext()
+        {
+            Instance = 1;
+        }
+    }
+
+    [Flags]
+    public enum TestFlag
+    {
+        None = 0,
+        A = 1,
+        B = 2,
+        C = 4,
     }
 }

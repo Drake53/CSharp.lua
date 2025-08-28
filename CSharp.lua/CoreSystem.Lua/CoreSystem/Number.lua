@@ -19,7 +19,7 @@ local throw = System.throw
 local define = System.defStc
 local equals = System.equals
 local zeroFn = System.zeroFn
-local identityFn = System.identityFn
+local hash = System.hash
 local debugsetmetatable = System.debugsetmetatable
 
 local IComparable = System.IComparable
@@ -103,7 +103,7 @@ local Int = define("System.Int", {
   CompareTo = compareInt,
   Equals = equals,
   ToString = toString,
-  GetHashCode = identityFn,
+  GetHashCode = hash,
   CompareToObj = function (this, v)
     if v == nil then return 1 end
     if type(v) ~= "number" then
@@ -239,7 +239,6 @@ setmetatable(UInt64, Int)
 local nan = 0 / 0
 local posInf = 1 / 0
 local negInf = - 1 / 0
-local nanHashCode = {}
 
 --http://lua-users.org/wiki/InfAndNanComparisons
 local function isNaN(v)
@@ -269,10 +268,6 @@ local function equalsObj(this, v)
   return equalsDouble(this, v)
 end
 
-local function getHashCode(this)
-  return isNaN(this) and nanHashCode or this
-end
-
 local Number = define("System.Number", {
   base = inherits,
   default = zeroFn,
@@ -284,7 +279,7 @@ local Number = define("System.Number", {
   NegativeInfinity = negInf,
   PositiveInfinity = posInf,
   EqualsObj = equalsObj,
-  GetHashCode = getHashCode,
+  GetHashCode = hash,
   CompareToObj = function (this, v)
     if v == nil then return 1 end
     if type(v) ~= "number" then
@@ -380,13 +375,10 @@ if not debugsetmetatable then
 
   function System.ObjectGetHashCode(this)
     if this == nil then throw(NullReferenceException()) end
-    local t = type(this)
-    if t == "number" then
-      return getHashCode(this)
-    elseif t == "table" then
+    if type(this) == "table" then
       return this:GetHashCode()
     end
-    return this
+    return hash(this)
   end
 
   function System.ObjectToString(this)

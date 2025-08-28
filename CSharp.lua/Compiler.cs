@@ -131,6 +131,7 @@ namespace CSharpLua {
         IsPreventDebugObject = IsPreventDebugObject,
         IsCommentsDisabled = IsCommentsDisabled,
         IsNotConstantForEnum = IsNotConstantForEnum,
+        IsNoConcurrent = IsNoConcurrent,
       };
     }
   }

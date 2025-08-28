@@ -44,7 +44,7 @@ local function hasFlag(this, flag)
   if this == flag then
     return true
   end
-  return band(this, flag) ~= 0
+  return band(this, flag) == flag
 end
 
 Number.EnumToString = toString
@@ -96,6 +96,7 @@ System.define("System.Enum", {
   default = Int.default,
   ToString = toString,
   HasFlag = hasFlag,
+  GetHashCode = Int.GetHashCode,
   GetName = function (enumType, value)
     if enumType == nil then throw(ArgumentNullException("enumType")) end
     if value == nil then throw(ArgumentNullException("value")) end

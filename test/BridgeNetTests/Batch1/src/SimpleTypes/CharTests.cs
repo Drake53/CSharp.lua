@@ -329,5 +329,20 @@ namespace Bridge.ClientTest.SimpleTypes
 #endif
             Assert.False(char.IsLetter("0" + '\u0100', 0), "#10");
         }
+
+        [Test]
+        public void IsAsciiLetterWorks()
+        {
+            Assert.True(char.IsAsciiLetter('A'), "Should match uppercase letter (first)");
+            Assert.True(char.IsAsciiLetter('Z'), "Should match uppercase letter (last)");
+            Assert.True(char.IsAsciiLetter('a'), "Should match lowercase letter (first)");
+            Assert.True(char.IsAsciiLetter('z'), "Should match lowercase letter (last)");
+
+            Assert.False(char.IsAsciiLetter('@'), "Should not match character before 'A'");
+            Assert.False(char.IsAsciiLetter('['), "Should not match character after 'Z'");
+            Assert.False(char.IsAsciiLetter('`'), "Should not match character before 'a'");
+            Assert.False(char.IsAsciiLetter('{'), "Should not match character after 'z'");
+            Assert.False(char.IsAsciiLetter('0'), "Should not match digit");
+        }
     }
 }
