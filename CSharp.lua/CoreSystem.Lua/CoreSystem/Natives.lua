@@ -1,6 +1,6 @@
 -- math functions are faster than natives, but may return different results when incorrect input values are given.
-Deg2Rad = math.deg
-Rad2Deg = math.rad
+Deg2Rad = math.rad
+Rad2Deg = math.deg
 
 Sin = math.sin
 Cos = math.cos
